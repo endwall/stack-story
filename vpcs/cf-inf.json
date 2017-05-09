@@ -1,0 +1,162 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Template for a Simple VPC with two public subnets",
+  "Parameters": {
+    "EnvPrefix": {
+      "Description": "Name prefix to identify vpcs in the same region.",
+      "Type": "String",
+      "Default": "Dev" 
+    },
+    "InternalIpBase": {
+      "Description": "The base CIDR block to use for the whole VPC",
+      "Type": "String",
+      "MinLength": "10",
+      "MaxLength": "20",
+      "AllowedPattern": "^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+/[0-9]+",
+      "ConstraintDescription": "Must be valid CIDR notation eg 172.16.0.0/16"
+    },
+    "PublicSubnetACIDR": {
+      "Description": "The CIDR block for the public subnet in AZ A",
+      "Type": "String",
+      "MinLength": "10",
+      "MaxLength": "20",
+      "AllowedPattern": "^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+/[0-9]+",
+      "ConstraintDescription": "Must be valid CIDR notation eg 172.16.255.0/24"
+    },
+    "PublicSubnetBCIDR": {
+      "Description": "The CIDR block for the public subnet in AZ B",
+      "Type": "String",
+      "MinLength": "10",
+      "MaxLength": "20",
+      "AllowedPattern": "^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+/[0-9]+",
+      "ConstraintDescription": "Must be valid CIDR notation eg 172.16.1.0/24"
+    }
+  },
+
+  "Resources": {
+    "SimpleVPC": {
+      "Type" : "AWS::EC2::VPC",
+      "Properties" : {
+        "CidrBlock" : { "Ref": "InternalIpBase"},
+        "EnableDnsSupport" : true,
+        "EnableDnsHostnames" : true,
+        "InstanceTenancy" : "default",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join" : ["-", [{"Ref": "AWS::Region"}, {"Ref" : "EnvPrefix"}, "VPC"]]}
+          }
+        ]
+      }
+    },
+
+    "InternetGateway": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "SimpleVPC Internet Gateway"
+          }
+        ]
+      }
+    },
+
+    "IGWAttachment": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "InternetGatewayId": { "Ref": "InternetGateway" },
+        "VpcId": { "Ref": "SimpleVPC" }
+      }
+    },
+
+    "PublicSubnetA": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": { "Fn::Select": [ "0", { "Fn::GetAZs": { "Ref": "AWS::Region" } } ] },
+        "CidrBlock": { "Ref": "PublicSubnetACIDR" },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join" : ["-", [{"Ref" : "EnvPrefix"}, "Subnet-Public-A"]]}
+          }
+        ],
+        "VpcId": { "Ref": "SimpleVPC" }
+      }
+    },
+
+    "PublicSubnetB": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": { "Fn::Select": [ "1", { "Fn::GetAZs": { "Ref": "AWS::Region" } } ] },
+        "CidrBlock": { "Ref": "PublicSubnetBCIDR" },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join" : ["-", [{"Ref" : "EnvPrefix"}, "Subnet-Public-B"]]}
+          }
+        ],
+        "VpcId": { "Ref": "SimpleVPC" }
+      }
+    },
+
+    "PublicSubnetRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": { "Ref": "SimpleVPC" },
+        "Tags"  : [
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join" : ["-", [{"Ref" : "EnvPrefix"}, "Public-Subnet-RouteTable"]]}
+          }
+        ]
+      }
+    },
+
+    "PublicRoute": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": { "Ref": "InternetGateway" },
+        "RouteTableId": { "Ref": "PublicSubnetRouteTable" }
+      }
+    },
+
+    "RouteAssociationPublicADefault": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": { "Ref": "PublicSubnetRouteTable" },
+        "SubnetId": { "Ref": "PublicSubnetA" }
+      }
+    },
+
+    "RouteAssociationPublicBDefault": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": { "Ref": "PublicSubnetRouteTable" },
+        "SubnetId": { "Ref": "PublicSubnetB" }
+      }
+    },
+  },
+
+  "Outputs": {
+    "VPCID": {
+      "Description": "The VPC ID of the Environment",
+      "Value": {
+        "Ref": "SimpleVPC"
+      }
+    },
+    "SubnetA": {
+      "Description": "Public Subnet A",
+      "Value": {
+        "Ref": "PublicSubnetA"
+      }
+    },
+    "SubnetB": {
+      "Description": "Public Subnet B",
+      "Value": {
+        "Ref": "PublicSubnetB"
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+[
+    {
+        "ParameterKey": "EnvPrefix",
+        "ParameterValue": "dev"
+    },
+    {
+        "ParameterKey": "VpcId",
+        "ParameterValue": "vpc-a2c85fc6"
+    },
+    {
+        "ParameterKey": "Subnets",
+        "ParameterValue": "subnet-9b4615ff,subnet-d85512ae"
+    },
+    {
+        "ParameterKey": "KeyName",
+        "ParameterValue": "kube"
+    },
+    {
+        "ParameterKey": "InstanceCount",
+        "ParameterValue": "1"
+    }
+
+]

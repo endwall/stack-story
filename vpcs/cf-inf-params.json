@@ -1,0 +1,18 @@
+[
+    {
+        "ParameterKey": "EnvPrefix",
+        "ParameterValue": "dev"
+    },
+    {
+        "ParameterKey": "InternalIpBase",
+        "ParameterValue": "172.16.16.0/20"
+    },
+    {
+        "ParameterKey": "PublicSubnetACIDR",
+        "ParameterValue": "172.16.16.0/24"
+    },
+    {
+        "ParameterKey": "PublicSubnetBCIDR",
+        "ParameterValue": "172.16.17.0/24"
+    }
+]
