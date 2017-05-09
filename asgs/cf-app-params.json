@@ -5,19 +5,19 @@
     },
     {
         "ParameterKey": "VpcId",
-        "ParameterValue": "vpc-a2c85fc6"
+        "ParameterValue": ""
     },
     {
         "ParameterKey": "Subnets",
-        "ParameterValue": "subnet-9b4615ff,subnet-d85512ae"
+        "ParameterValue": ""
     },
     {
         "ParameterKey": "KeyName",
-        "ParameterValue": "kube"
+        "ParameterValue": ""
     },
     {
         "ParameterKey": "InstanceCount",
-        "ParameterValue": "1"
+        "ParameterValue": "2"
     }
 
 ]

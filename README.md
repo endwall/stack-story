@@ -1,7 +1,9 @@
 # stack-story
 various stories about stacks
 
-Before running, it needs proper account and access credentials.
+## Prerequisitions
+- proper account and access credentials.
+- a keypair
 
 ## VPCs
 Directory vpcs Template for creating a simple VPC with 2 public subnets.
@@ -18,6 +20,8 @@ The resouces it will creates:
   - Routetable
 ## asgs
 This is the cloudformation for deploying a simple hello-world app. At the end of the deployment, it will deploy 2 docker containers (carinamarina/hello-world-web and carinamarina/hello-world-app).
+
+It depends on the VPC created in the previous step. With that created VPCs, we can have VPC_ID, SubnetIDs as input for asgs/cf-app-params.json (as well as your keypair name).
 
 AWS CLI:
 ```
